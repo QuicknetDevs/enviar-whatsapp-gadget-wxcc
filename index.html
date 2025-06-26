@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enviar mensaje de WhatsApp</title>
+    <style>
+        body {
+            background-color: #ffffff;
+            color: #000;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: #fffbe6;
+            padding: 32px 28px 24px 28px;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+            min-width: 340px;
+        }
+        h1 {
+            color: #007EC3;
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 1.6em;
+            letter-spacing: 1px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        .input-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+        .input-prefix {
+            background: #eee;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-right: none;
+            border-radius: 6px 0 0 6px;
+            font-size: 1em;
+            color: #333;
+        }
+        .input-phone {
+            border-radius: 0 6px 6px 0;
+            border: 1px solid #ccc;
+            border-left: none;
+            padding: 10px;
+            width: 100%;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+        .input-phone:focus, input[type="text"]:focus {
+            border-color: #007EC3;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.2s;
+            margin-bottom: 18px;
+            box-sizing: border-box;
+
+            display: block;
+        }
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        button {
+            flex: 1;
+            padding: 10px 0;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        button[type="submit"] {
+            background: #007EC3;
+            color: #fff;
+        }
+        button[type="submit"]:hover {
+            background: #00c32a;
+        }
+        button[type="button"] {
+            background: #fff;
+            color: #007EC3;
+            border: 1px solid #007EC3;
+        }
+        button[type="button"]:hover {
+            background: #e6eaff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Enviar mensaje de WhatsApp</h1>
+        <form id="whatsappForm" autocomplete="off">
+            <label for="phone">Número de teléfono</label>
+            <div class="input-group">
+                <span class="input-prefix">+506</span>
+                <input type="tel" id="phone" name="phone" class="input-phone" pattern="[0-9]{8}" maxlength="8" required placeholder="XXXXXXXX">
+            </div>
+            <label for="agent">Nombre de Agente</label>
+            <input type="text" id="agent" name="agent" required placeholder="Ejemplo: Juan Pérez">
+            <div class="button-group">
+                <button type="submit">Enviar mensaje</button>
+                <button type="button" onclick="document.getElementById('whatsappForm').reset(); document.getElementById('result').textContent = '';">Limpiar</button>
+            </div>
+        </form>
+        <div id="result" style="margin-top:16px;text-align:center;"></div>
+    </div>
+    <script>
+        document.getElementById('whatsappForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            let phoneInput = document.getElementById('phone').value.trim();
+            phoneInput = phoneInput.replace(/^(\+506|506)/, '');
+            const phone = '+506' + phoneInput;
+            const agent = document.getElementById('agent').value;
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = 'Enviando...';
+
+            try {
+                const response = await fetch('https://hooks.us.webexconnect.io/events/J4THDSDVRG', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        number: phone,
+                        name: agent
+                    })
+                });
+
+                if (response.ok) {
+                resultDiv.textContent = 'Mensaje enviado correctamente.\n\n';
+                document.getElementById('whatsappForm').reset();
+                } else {
+                    resultDiv.textContent = 'Error al enviar el mensaje.\n';
+                }
+            } catch (error) {
+                resultDiv.textContent = 'Error de conexión.';
+            }
+        });
+    </script>
+</body>
+</html>
