@@ -111,52 +111,60 @@
     <div class="container">
         <h1>Enviar mensaje de WhatsApp</h1>
         <form id="whatsappForm" autocomplete="off">
+            <label for="agent">Nombre de Agente</label>
+            <input type="text" id="agent" name="agent" required placeholder="Ejemplo: Juan Pérez">
+            
             <label for="phone">Número de teléfono</label>
             <div class="input-group">
                 <span class="input-prefix">+506</span>
                 <input type="tel" id="phone" name="phone" class="input-phone" pattern="[0-9]{8}" maxlength="8" required placeholder="XXXXXXXX">
             </div>
-            <label for="agent">Nombre de Agente</label>
-            <input type="text" id="agent" name="agent" required placeholder="Ejemplo: Juan Pérez">
+            
+            <label for="extension">Número de extensión</label>
+            <input type="text" id="extension" name="extension" required placeholder="Ejemplo: 1234" maxlength="4" pattern="[0-9]{1,4}">
+
             <div class="button-group">
                 <button type="submit">Enviar mensaje</button>
                 <button type="button" onclick="document.getElementById('whatsappForm').reset(); document.getElementById('result').textContent = '';">Limpiar</button>
             </div>
+
         </form>
         <div id="result" style="margin-top:16px;text-align:center;"></div>
     </div>
     <script>
-        document.getElementById('whatsappForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            let phoneInput = document.getElementById('phone').value.trim();
-            phoneInput = phoneInput.replace(/^(\+506|506)/, '');
-            const phone = '+506' + phoneInput;
-            const agent = document.getElementById('agent').value;
-            const resultDiv = document.getElementById('result');
-            resultDiv.textContent = 'Enviando...';
+    document.getElementById('whatsappForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        let phoneInput = document.getElementById('phone').value.trim();
+        phoneInput = phoneInput.replace(/^(\+506|506)/, '');
+        const phone = '+506' + phoneInput;
+        const agent = document.getElementById('agent').value;
+        const extension = document.getElementById('extension').value;
+        const resultDiv = document.getElementById('result');
+        resultDiv.textContent = 'Enviando...';
 
-            try {
-                const response = await fetch('https://hooks.us.webexconnect.io/events/J4THDSDVRG', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        number: phone,
-                        name: agent
-                    })
-                });
+        try {
+            const response = await fetch('https://hooks.us.webexconnect.io/events/J4THDSDVRG', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    number: phone,
+                    name: agent,
+                    extension: extension
+                })
+            });
 
-                if (response.ok) {
+            if (response.ok) {
                 resultDiv.textContent = 'Mensaje enviado correctamente.\n\n';
                 document.getElementById('whatsappForm').reset();
-                } else {
-                    resultDiv.textContent = 'Error al enviar el mensaje.\n';
-                }
-            } catch (error) {
-                resultDiv.textContent = 'Error de conexión.';
+            } else {
+                resultDiv.textContent = 'Error al enviar el mensaje.\n';
             }
-        });
+        } catch (error) {
+            resultDiv.textContent = 'Error de conexión.';
+        }
+    });
     </script>
 </body>
 </html>
